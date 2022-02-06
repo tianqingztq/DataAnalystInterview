@@ -166,24 +166,35 @@ from (
 -- Make sure your output is formatted as follows (round expenditure to nearest hundredths):
 -- Bon app|BONAP|4485708.49
 select
-ifnull(CompanyName, 'MISSING_NAME') as CompanyName
+CompanyName
 ,CustomerId
-,ntile(4) over (partition by CustomerId order by total_expenditures ASC) 
+,total_expenditures
 from (
-    select 
+    select
     CompanyName
-    ,Customer.Id as CustomerId
-    ,round(sum(Orderdetail.UnitPrice * Orderdetail.Quantity), 2) as total_expenditures
-    from Customer
-    left join Order on Order.CustomerId = Customer.Id
-    inner join Orderdetail on Order.Id = Orderdetail.OrderId
-    group by Customer.Id
-) 
-
+    ,CustomerId
+    ,total_expenditures
+    ,ntile(4) over (order by total_expenditures ASC) as ExpenditureQuartile
+    -- This function divides the partition into N groups as evenly as possible 
+    -- and assigns an integer between 1 and N to each group, 
+    -- in the order defined by the ORDER BY clause
+    from (
+        select 
+        ifnull(CompanyName, 'MISSING_NAME') as CompanyName
+        ,Order.CustomerId as CustomerId
+        ,round(sum(Orderdetail.UnitPrice * Orderdetail.Quantity), 2) as total_expenditures
+        from Order
+        left join Customer on Order.CustomerId = Customer.Id
+        inner join Orderdetail on Order.Id = Orderdetail.OrderId
+        group by Order.CustomerId
+    ) 
+)
+where ExpenditureQuartile = 1
+Order by total_expenditures ASC
 ;
 
 
-
+-- Or: with the with structure
 WITH expenditures AS (
     SELECT
         IFNULL(c.CompanyName, 'MISSING_NAME') AS CompanyName,
@@ -204,7 +215,74 @@ WHERE ExpenditureQuartile = 1
 ORDER BY TotalCost ASC
 
 
+-- ## Q9
+-- Find the youngest employee serving each Region. If a Region is not served by
+-- an employee, ignore it.
 
+-- Details: Print the following format, order by Region Id
+-- Region Description|FirstName|LastName|Birthdate, your first row should look like
+-- Eastern|Steven|Buchanan|1987-03-04
+
+
+SELECT RegionDescription, FirstName, LastName, bday
+FROM 
+(
+  SELECT RegionId AS rid, MAX(Employee.Birthdate) AS bday 
+  FROM Employee
+    INNER JOIN EmployeeTerritory ON Employee.Id = EmployeeTerritory.EmployeeId
+    INNER JOIN Territory ON TerritoryId = Territory.Id
+  GROUP BY RegionId
+)
+INNER JOIN (
+            SELECT FirstName, LastName, Birthdate, RegionId, EmployeeId
+            FROM Employee
+              INNER JOIN EmployeeTerritory ON Employee.Id = EmployeeTerritory.EmployeeId
+              INNER JOIN Territory ON TerritoryId = Territory.Id
+           )
+           ON Birthdate = bday AND rid = RegionId
+INNER JOIN Region ON Region.Id = RegionId
+GROUP BY EmployeeId
+ORDER BY rid;
+
+
+-- ## Q10
+-- Concatenate the ProductNames ordered by the Company 'Queen Cozinha' between
+-- 2014-12-25 and 2014-12-26, print this as a string of
+-- comma-separated values(like "Mishi Kobe Niku, NuNuCa Nuß-Nougat-Creme...")
+
+-- Details: Find all Products ordered by the Company 'Queen Cozinha' between
+-- 2014-12-25 and 2014-12-26 and order them by id (ascending).
+-- Print a single string containing all the dup names separated by commas.   
+-- Hint: You might find Recursive CTEs useful.
+
+
+with product as (
+    select 
+    Product.Id, Product.ProductName as name
+    from Customer
+    inner join Order on Customer.Id = Order.CustomerId
+    inner join Orderdetail on Product.id = OrderDetail.ProductId
+    inner join Product on Product.id = Orderdetail.OrderId
+    where CompanyName = 'Queen Cozinha'
+    and date(DateOrderDate) = '2014-12-25'
+    group by Product.Id
+),
+c as (
+      select row_number() over (order by p.id asc) as seqnum, p.name as name
+      from p
+),
+flattened as (
+    select seqnum, name
+    from c
+    where seqnum = 1
+    union all
+    select c.seqnum, f.name || ',' || c.name
+    from c join 
+    flattened f
+    on c.seqnum = f.seqnum + 1
+)
+select name from flattened
+order by seqnum desc limit 1;
 
 
 
