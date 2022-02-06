@@ -27,7 +27,7 @@ select DATEDIFF(DATE('2018-08-29'), DATE('2018-01-01')) as days;
 -- ## Store query results in another table:
 -- Table must not already be definded
 -- Table will have the same # of columns with the same types as the input
-CREATE TABLE CourseIds (
+CREATE TABLE if not exists CourseIds (
     SELECT DISTINCT cid
     FROM enrolled
 );
