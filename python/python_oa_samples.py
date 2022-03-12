@@ -11,28 +11,28 @@
 # from math import sqrt
 
 
-# def solution(A, B):
-#     """
-#     x*(x+1) = a is even.
-#     sqrt(4a+1) is an int.
-#     """
-#     # find the even sublist from the original list
-#     ls_even = [x for x in range(A, B + 1) if x % 2 == 0]
+def solution(A, B):
+    """
+    x*(x+1) = a is even.
+    sqrt(4a+1) is an int.
+    """
+    # find the even sublist from the original list
+    ls_even = [x for x in range(A, B + 1) if x % 2 == 0]
 
-#     # check sqrt(4a+1) is an int
-#     result = []
-#     for i in ls_even:
-#         temp = sqrt(4 * i + 1)
-#         if temp == round(temp):
-#             result.append(i)
+    # check sqrt(4a+1) is an int
+    result = []
+    for i in ls_even:
+        temp = sqrt(4 * i + 1)
+        if temp == round(temp):
+            result.append(i)
 
-#     if len(result) == 0:
-#         result = 0
-#     return result
+    if len(result) == 0:
+        result = 0
+    return result
 
 
-# print(solution(6, 20))
-# print(solution(21, 29))
+print(solution(6, 20))
+print(solution(21, 29))
 
 
 # Given an array A of integers containing N integers
@@ -40,18 +40,18 @@
 # Assumptions: N >=0; can be negative numbers
 
 #####################
-# def solution(A):
-#     result = 0
-#     for i in A:
-#         if abs(i) > 9 and abs(i) < 100:
-#             result += i
+def solution(A):
+    result = 0
+    for i in A:
+        if abs(i) > 9 and abs(i) < 100:
+            result += i
 
-#     return result
+    return result
 
 
-# print(solution([1, 1000, 80, -91]))
-# print(solution([47, 1900, 1, 90, 45]))
-# print(solution([-13, 1900, 1, 100, 45]))
+print(solution([1, 1000, 80, -91]))
+print(solution([47, 1900, 1, 90, 45]))
+print(solution([-13, 1900, 1, 100, 45]))
 
 
 # Given an integer N, returns the smallest integer that is
