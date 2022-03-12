@@ -1,3 +1,4 @@
+-- room_id|user_id|start_time|end_time
 select 
     room_id,
     max(uv) as max_user_num
