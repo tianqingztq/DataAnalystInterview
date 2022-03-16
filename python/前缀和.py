@@ -6,6 +6,7 @@ class Solution:
         """
         # time exceed
         # 构造前缀和
+        # Time complexity O(n^2)
         preSum = [0] * (len(nums)+1)
         temp = 0
         for i in range(len(nums)):
@@ -35,6 +36,8 @@ class Solution:
             sum_map[preSum] += 1
 
         return cnt
+        # time complexity O(n)
+        # space complexity O(n)
 
 
 # right - left
