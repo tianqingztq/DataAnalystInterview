@@ -67,7 +67,7 @@ class Node:
 
 class Solution:
     """
-    二叉树的层序遍历，基于广度优先搜索
+    二叉树的层序遍历，基于广度优先搜索 bfs
     """
 
     def connect(self, root: "Optional[Node]") -> "Optional[Node]":
